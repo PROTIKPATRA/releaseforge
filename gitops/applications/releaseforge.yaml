@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: releaseforge
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PROTIKPATRA/releaseforge.git
+    targetRevision: main
+    path: gitops/rollouts/canary
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: releaseforge
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

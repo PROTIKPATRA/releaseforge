@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+  namespace: releaseforge
+spec:
+  metrics:
+    - name: success-rate
+      interval: 15s
+      count: 3
+      successCondition: len(result) == 0 || result[0] >= 0.95
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            sum(rate(http_requests_total{route="/api/orders", status_code=~"2.."}[1m]))
+            /
+            sum(rate(http_requests_total{route="/api/orders"}[1m]))
